@@ -4,20 +4,33 @@
 #' This function will calculate the risk measure as indicated in the research
 #' paper
 #'
-#' @param exposure The exposure is the distance travelled by the
-#' @param crashes A dataframe containing the spfpoint objects where the crashes
-#' occurred in lat/lng
+#' @param person_travelled The distance travelled by the person aggregated
 #'
-#' @return returns dataframe with new column
+#' @param crash_lat The latitude coordinate of crash point. Needs to be a vector.
+#'
+#' @param crash_lng The longitude coordinate of crash point. Needs to be a vector.
+#'
+#' @param crash_weight The number of crashes in a given lat/lng points.
+#'
+#' @return This function returns a dataframe with new column called
+#' risk_per_m as
 #'
 #'
 
+get_risk <- function(person_travelled, crash_lat, crash_lng, crash_weight){
 
-get_risk <- function(exposure, crashes){
+  #create a dataframe
+  crash_data <-  data.frame(crash_weight = crash_weight,
+                            crash_lat = crash_lat,
+                            crash_lng = crash_lng)
 
-  st_join(exposure, crashes, left = FALSE) %>%
-    group_by(SA22021_V1, exposure_m, total_travelers) %>% #need to generalise this
-    summarise(injuries = sum(seriousInjuryCount)) %>%
-    mutate(risk_per_bkm = injuries/(exposure_m/1000000000))  #converting meters to billion meters
+  #change lat and lng as sf objects
+  crash_data_sf <- st_as_sf(crash_data, coords = c("crash_lng", "crash_lat"),
+                            crs = 4326)
 
+  #calculating the risk exposure
+  st_join(person_travelled, crash_data_sf, left = FALSE) %>%
+    group_by(polygon_id, person_travelled_m, total_weight) %>%
+    summarise(total_crash_weight = sum(crash_weight)) %>%
+    mutate(risk_per_m = total_crash_weight/person_travelled_m)
 }

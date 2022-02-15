@@ -51,13 +51,13 @@ get_person_travelled <- function(routes, weight, polygon, polygon_id){
   #aggregating the total distance travelled by the traveller agains the polygon code
   output <- output %>%
     group_by(polygon_id) %>%
-    summarise(person_travelled_km = sum(total_dist), total_weight = sum(weight)) %>%
-    mutate(person_travelled_km = as.numeric(person_travelled_km))
+    summarise(person_travelled_m = sum(total_dist), total_weight = sum(weight)) %>%
+    mutate(person_travelled_m = as.numeric(person_travelled_m))
 
   #adding geometric info
   output <- left_join(polygon, output)
 
   #returns only polygons that intersects with the routes, ensure no NAs are returned
-  output[which(!is.na(output$person_travelled_km)), ]
+  output[which(!is.na(output$person_travelled_m)), ]
 
 }
