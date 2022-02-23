@@ -8,9 +8,16 @@
 #' @param lng_dest The longitude coodinates of the destination point, needs to be a vector
 
 
-get_routes <- function(lat_source, lng_source, lat_dest, lng_dest, weight){
+get_routes <- function(lat_source, lng_source, lat_dest, lng_dest, osm_dir){
 ##note that gh::route uses the parameter "vehicle" to specify the transportation
 ##mode
+
+
+  if(missing(osm_dir)){
+    if (!file.exists("new-zealand-latest.osm.pbf")){
+    download.file("https://download.geofabrik.de/australia-oceania/new-zealand-latest.osm.pbf", "new-zealand-latest.osm.pbf")
+      osm_dir <- "new-zealand-latest.osm.pbf"
+      }}
 
   ##Error handling on inputs
   ##check that lengths for all inputs are the same
@@ -31,6 +38,8 @@ get_routes <- function(lat_source, lng_source, lat_dest, lng_dest, weight){
                   is.na(lat_source))))
     stop("inputs must not contain NAs")
 
+  #initialise router
+  gh:router(osm.file = osm_dir)
 
   ##get list of routes
   routes_list <- lapply(seq.int(length(lat_source)), function(i) {
