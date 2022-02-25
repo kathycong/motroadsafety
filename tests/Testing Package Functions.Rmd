@@ -35,6 +35,24 @@ test_get_routes
 
 The purpose of this function is to provide the indices of
 
+```{r}
+
+test_get_route_intersects <- get_route_intersects(test_get_routes, sa2_clipped_geo_akl)
+
+test_get_route_intersects[[1]]
+
+leaflet() %>% 
+  addTiles() %>%
+  addPolygons(data = sa2_clipped_geo_akl[test_get_route_intersects[[1]], ], color = 'red') %>% 
+  addPolylines(data = test_get_routes[1, ])
+  
+
+ 
+```
+
+
+###
+
 
 
 ```{r}

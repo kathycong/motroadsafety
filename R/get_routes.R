@@ -62,6 +62,7 @@ get_routes <- function(lat_source, lng_source, lat_dest, lng_dest, osm_dir){
       st_sfc(st_linestring(x), crs = 4326)})
   })
 
+  #https://stackoverflow.com/questions/21937640/handling-java-lang-outofmemoryerror-when-writing-to-excel-from-r
   gc()
  .jcall("java/lang/System", method = "gc")
 

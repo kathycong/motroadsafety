@@ -14,7 +14,7 @@
 
 get_route_intersects <- function(routes, polygon){
 
-  lapply(seq.int(nrow(polygon)),
+  lapply(seq.int(nrow(routes)),
 
-  function(i) which(lengths(sf::st_intersects(polygon[i, ], routes) > 0))
+  function(i) which(lengths(sf::st_intersects(polygon, routes[i, ])) > 0))
 }
