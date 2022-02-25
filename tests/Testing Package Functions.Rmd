@@ -1,0 +1,134 @@
+
+#Running through MoT Road Safety Package R
+
+### Loading the data
+
+```{r}
+
+data("jtw_usual_res_geo_sample_data")
+data("jtw_work_geo_sample_data")
+data("sa2_clipped_geo_akl")
+
+```
+
+
+### get routes function
+
+The purpose of get routes function is for user to provide a vector of source 
+and destination lat/lon points and returns it as an sf dataframe. 
+If no route is found then the function will return an empty sf object value 
+in the sf dataframe
+
+```{r}
+
+test_get_routes <-  
+get_routes(c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "Y"],-36.85576),
+           c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "X"],174.8324),
+           c(sf::st_coordinates(jtw_work_geo_sample_data)[, "Y"],41.2709),
+           c(sf::st_coordinates(jtw_work_geo_sample_data)[, "X"],173.1476))
+
+test_get_routes
+
+```
+
+### get intersections
+
+The purpose of this function is to provide the indices of
+
+
+
+```{r}
+
+sf::st_
+get_routes()
+
+ghroute::router(osm.file = "C:\\Users\\kathl\\Documents\\University of Auckland\\Mprof Data Science\\COMPSCI 791 Industry Research Project - MoT Trafficalmr Package in R\\MoT_road_safety_proj\\osm\\new-zealand-latest.osm.pbf")
+
+
+ghroute::router(osm.file = "new-zealand-latest.osm.pbf")
+
+#working ok now
+test2 <- get_routes(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "Y"],
+           sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "X"],
+           sf::st_coordinates(jtw_work_geo_sample_data)[, "Y"],
+           sf::st_coordinates(jtw_work_geo_sample_data)[, "X"])
+
+
+#testing no routes
+test_no_routes_error <-  
+get_routes(c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "Y"],-36.85576),
+           c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "X"],174.8324),
+           c(sf::st_coordinates(jtw_work_geo_sample_data)[, "Y"],41.2709),
+           c(sf::st_coordinates(jtw_work_geo_sample_data)[, "X"],173.1476))
+
+(test_no_routes_error, recursive = FALSE)
+
+
+
+st_point(tryCatch(ghroute::route(-36.85576, 174.8324, 41.2709, 173.1476), error = function(e) NA))
+  
+  
+test3 = rbind(test2, st_as_sf(st_sfc(NULL, crs = 4326)))
+
+class(test3)
+
+st_linestring(st_sfc(NULL, crs = 4326))
+
+
+
+length(test_no_routes_error)
+
+test_no_routes_error[[1]]
+
+lapply(lengt(i),)
+
+##################################
+test <-  ghroute::route(sf::st_coordinates(jtw_usual_res_geo_sample_data)[1, "Y"],
+           sf::st_coordinates(jtw_usual_res_geo_sample_data)[1, "X"],
+           sf::st_coordinates(jtw_work_geo_sample_data)[1, "Y"],
+           sf::st_coordinates(jtw_work_geo_sample_data)[1, "X"])
+
+
+st_geom(test[[1]][[1]][ ,2:1])
+
+
+sf_value_transform <- function(x){ st_as_sf(
+  
+  if(any(is.na(x))){
+    st_sfc(x, crs = 4326)}
+  else {
+    st_sfc(st_linestring(x), crs = 4326)})
+  }
+
+
+sf_value_transform(test_no_routes_error[[4]])
+
+sf_value_transform, test_no_routes_error)
+
+do.call(rbind, lapply(test_no_routes_error, sf_value_transform))
+
+
+final_result <- map_dfr(test_no_routes_error, function(x){ st_as_sf(
+  
+  if(any(is.na(x))){
+    st_sfc(x, crs = 4326)}
+  else {
+    st_sfc(st_linestring(x), crs = 4326)})
+  })
+
+class(final_result)
+
+final_result
+
+jgc <- function()
+{
+  gc()
+  .jcall("java/lang/System", method = "gc")
+} 
+
+jgc()
+
+```
+
+
+
