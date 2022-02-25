@@ -47,11 +47,23 @@ leaflet() %>%
   addPolylines(data = test_get_routes[1, ])
   
 
- 
+```
+
+### get distance travelled
+
+```{r}
+
+get_dist_travelled(test_get_routes[1:3, ], st_geometry(sa2_clipped_geo_akl), sa2_clipped_geo_akl$SA22021_V1)
+                   
+
+get_dist_travelled(test_get_routes[1:3, ], 
+                       st_geometry(sa2_clipped_geo_akl[, 1:3]), 
+                       sa2_clipped_geo_akl[, 1:3]$SA22021_V1)
+           
+
 ```
 
 
-###
 
 
 
