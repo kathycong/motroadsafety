@@ -31,14 +31,10 @@ get_risk <- function(crash_lat, crash_lng, crash_weight, polygon){
   #calculating the risk exposure
   output <- st_join(polygon, crash_data_sf)
 
-  #output <- st_drop_geometry(output) %>%
-   # group_by_at(vars(-total_crash_weight)) %>%
-    #summarise(total_crash_weight = sum(total_crash_weight))
+  output  %>%
+    group_by_at(vars(-total_crash_weight, -geometry)) %>%
+    summarise(total_crash_weight = sum(total_crash_weight))
 
-
-
-  #cbind(polygon['geometry'], output)
-  output
 }
 
 
