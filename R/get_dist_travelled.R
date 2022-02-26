@@ -14,7 +14,7 @@
 #'
 #' @param weight The weight for each line segment or route. This is optional.
 
-get_dist_travelled <- function(polygon, routes, weight){
+get_dist_travel <- function(polygon, routes, weight){
 
   #weight is an optional argument
 
@@ -50,3 +50,46 @@ get_dist_travelled <- function(polygon, routes, weight){
                               'distance_travelled', 'geometry')])
 
 }
+
+
+get_dist_travel <- function(polygon, routes, weight){
+
+  #weight is an optional argument
+
+  #if weight param is missing then default to 1
+  if(missing(weight)){
+    weight <- rep(1, nrow(routes))
+  } else weight
+
+
+  #############checks#########
+  # 1. input has the correct class
+  # 2. input has the correct length i.e. length(routes) == weight
+  # 3. Data has no NaNs
+
+  #binding routes and weight as its easier for aggregation later on
+  routes <- cbind(routes, weight = weight)
+
+  #avoiding errors
+  st_agr(routes) <- "constant"
+  st_agr(polygon) <- "constant"
+
+  # getting the intersection of polygons and routes provided
+  output <- st_intersection(polygon, routes)
+
+  #getting distance travelled
+  output$total_dist<- st_length((output)) * output$weight
+
+  output <- st_join(polygon, output[, c('total_dist', 'weight', 'geometry')])
+
+  #grouping by aggregated data
+  output<- st_drop_geometry(output) %>%
+    group_by_at(vars(-total_dist, -weight)) %>%
+    summarise(total_dist  = sum(total_dist),
+              weight = sum(weight))
+
+  #adding polygon data
+  cbind(polygon[, 'geometry'], output)
+
+}
+
