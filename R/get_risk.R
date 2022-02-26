@@ -34,3 +34,32 @@ get_risk <- function(person_travelled, crash_lat, crash_lng, crash_weight){
     summarise(total_crash_weight = sum(crash_weight)) %>%
     mutate(risk_per_m = total_crash_weight/person_travelled_m)
 }
+
+########################
+
+
+
+get_risk <- function(crash_lat, crash_lng, crash_weight, polygon){
+
+  #create a dataframe
+  crash_data <-  data.frame(total_crash_weight = crash_weight,
+                            crash_lat = crash_lat,
+                            crash_lng = crash_lng)
+
+  #change lat and lng as sf objects
+  crash_data_sf <- st_as_sf(crash_data, coords = c("crash_lng", "crash_lat"),
+                            crs = 4326)
+
+  #calculating the risk exposure
+  output <- st_join(polygon, crash_data_sf)
+
+  output <- st_drop_geometry(output) %>%
+    group_by_at(vars(-total_crash_weight)) %>%
+    summarise(total_crash_weight = sum(total_crash_weight))
+
+
+
+  cbind(polygon['geometry'], output)
+}
+
+
