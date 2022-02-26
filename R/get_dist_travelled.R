@@ -45,7 +45,7 @@ get_dist_travel <- function(polygon, routes, weight){
   output <- sf::st_join(polygon, output[, c('total_dist', 'weight', 'geometry')])
 
   #grouping by aggregated data
-  get_dist_travelled_test  %>%
+  output  %>%
     group_by_at( vars(-total_dist, -weight, -geometry)) %>%
     summarise(total_dist  = sum(total_dist),
               weight = sum(weight))
