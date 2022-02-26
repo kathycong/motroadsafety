@@ -54,17 +54,17 @@ get_routes <- function(lat_source, lng_source, lat_dest, lng_dest, osm_dir){
 
   ##transforms the nested list of sf linesegments or routes into a dataframe
 
-  output <- purrr::map_dfr(routes_list, function(x){ st_as_sf(
+  output <- purrr::map_dfr(routes_list, function(x){ sf::st_as_sf(
 
     if(any(is.na(x))){
-      st_sfc(x, crs = 4326)}
+      sf::st_sfc(x, crs = 4326)}
     else {
-      st_sfc(st_linestring(x), crs = 4326)})
+      sf::st_sfc(sf::st_linestring(x), crs = 4326)})
   })
 
   #https://stackoverflow.com/questions/21937640/handling-java-lang-outofmemoryerror-when-writing-to-excel-from-r
   gc()
- .jcall("java/lang/System", method = "gc")
+ rJava::.jcall("java/lang/System", method = "gc")
 
  output
 }
