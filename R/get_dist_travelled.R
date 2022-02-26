@@ -40,44 +40,6 @@ get_dist_travel <- function(polygon, routes, weight){
   output <- st_intersection(polygon, routes)
 
   #getting distance travelled
-  output$distance_travelled <- st_length((output))
-
-  #total distance travelled times the number of weight
-  output$total_dist <- (output$distance_travelled * output$weight)
-
-  #add polygon data
-  st_join(polygon, output[, c('total_dist', 'weight',
-                              'distance_travelled', 'geometry')])
-
-}
-
-
-get_dist_travel <- function(polygon, routes, weight){
-
-  #weight is an optional argument
-
-  #if weight param is missing then default to 1
-  if(missing(weight)){
-    weight <- rep(1, nrow(routes))
-  } else weight
-
-
-  #############checks#########
-  # 1. input has the correct class
-  # 2. input has the correct length i.e. length(routes) == weight
-  # 3. Data has no NaNs
-
-  #binding routes and weight as its easier for aggregation later on
-  routes <- cbind(routes, weight = weight)
-
-  #avoiding errors
-  st_agr(routes) <- "constant"
-  st_agr(polygon) <- "constant"
-
-  # getting the intersection of polygons and routes provided
-  output <- st_intersection(polygon, routes)
-
-  #getting distance travelled
   output$total_dist<- st_length((output)) * output$weight
 
   output <- st_join(polygon, output[, c('total_dist', 'weight', 'geometry')])
