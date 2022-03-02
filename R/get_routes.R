@@ -11,7 +11,7 @@ get_routes <- function(lat_source, lng_source, lat_dest, lng_dest, osm_dir){
   ##note that gh::route uses the parameter "vehicle" to specify the transportation
   ##mode
 
-
+  #checking NZ osm file is available
   if(missing(osm_dir)){
     if (!file.exists("new-zealand-latest.osm.pbf")){
       download.file("https://download.geofabrik.de/australia-oceania/new-zealand-latest.osm.pbf", "new-zealand-latest.osm.pbf")

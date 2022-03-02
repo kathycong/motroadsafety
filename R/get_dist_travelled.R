@@ -45,10 +45,16 @@ get_dist_travel <- function(polygon, routes, weight){
   output <- sf::st_join(polygon, output[, c('total_dist', 'weight', 'geometry')])
 
   #grouping by aggregated data
-  output  %>%
+  output <- output  %>%
     group_by_at( vars(-total_dist, -weight, -geometry)) %>%
     summarise(total_dist  = sum(total_dist),
               weight = sum(weight))
 
-}
+  return(output)
+
+
+  output %>% mapview(zcol = 'total_dist',
+          layer.name = "total distance travelled")
+
+  }
 
