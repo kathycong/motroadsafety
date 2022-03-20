@@ -195,6 +195,8 @@ Next Steps:
 
 3. implementing the functions with MB data and applying random sampling to increase route accuracy
 
+4. create an s3 generic on sf class to plot or visualise the data
+
 Simon:
 - take into account direction of the roads and where crash location occurred
 
