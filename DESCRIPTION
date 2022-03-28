@@ -16,6 +16,7 @@ Imports:
     sf,
     dplyr,
     purrr,
-    ghroute
+    ghroute,
+    magrittr
 Remotes:
     github::s-u/ghroute

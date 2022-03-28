@@ -14,7 +14,9 @@ get_routes <- function(lat_source, lng_source, lat_dest, lng_dest, osm_dir){
   #checking NZ osm file is available
   if(missing(osm_dir)){
     if (!file.exists("new-zealand-latest.osm.pbf")){
-      download.file("https://download.geofabrik.de/australia-oceania/new-zealand-latest.osm.pbf", "new-zealand-latest.osm.pbf")
+      download.file(url = "https://download.geofabrik.de/australia-oceania/new-zealand-latest.osm.pbf",
+                    destfile = "new-zealand-latest.osm.pbf",
+                    mode = "wb")
       warning("Downloading osm pbf file from https://download.geofabrik.de/australia-oceania/new-zealand-latest.osm.pbf")
     }
     osm_dir <- "new-zealand-latest.osm.pbf"   }
