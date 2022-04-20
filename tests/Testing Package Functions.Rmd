@@ -1,12 +1,37 @@
 
 #Running through MoT Road Safety Package R
 
+### Libraries required to build a package
+
+```{r}
+library(devtools)
+library(roxygen2)
+library(testthat)
+library(knitr)
+```
+
+### Libraries required in the package or for teh data analysis
+
+```{r}
+## these are the libraries that are require
+
+library(sf)
+library(ghroute)
+router(osm.file = "~/Documents/University of Auckland/COMPSCI 791 Research Project/mot_road_safety_project/osm")
+library(leaflet)
+library(mapview)
+library(readxl)
+library(dplyr)
+
+
+```
+
 
 ### Loading the data
 
 ```{r}
 
-library(leaflet)
+
 
 data("jtw_usual_res_geo_sample_data")
 data("jtw_work_geo_sample_data")
@@ -14,6 +39,57 @@ data("sa2_clipped_geo_akl")
 data("cas_data_sample_2018")
 
 ```
+#### i. Loading the full dataset
+
+```{r}
+
+## Read journey to work Data 2018
+jtw_data <- read.csv("~/Documents/University of Auckland/COMPSCI 791 Research Project/data/2018-census-main-means-of-travel-to-work-by-statistical-area.csv", fileEncoding="UTF-8-BOM")
+
+## SA2 to MB mapping provided by StatsNZ
+key <- read_xlsx("~/Documents/University of Auckland/COMPSCI 791 Research Project/data/Stats NZ Geographic Key.xlsx", 
+           sheet = "Geographic Key")
+
+## correcting Territorial auth desc name
+names(key)[8] <- "Territorial_auth_desc"
+
+## grouping by SA2 and territorial auth district to remove duplicates
+key_2 <- key[, c(3,8)] %>% 
+  group_by(`Statistical area 2 code (2018 areas)`, Territorial_auth_desc) %>% 
+  summarise(n = n()) %>% 
+  mutate(`Statistical area 2 code (2018 areas)` = 
+           as.integer(`Statistical area 2 code (2018 areas)`))
+
+
+## only interested in Auckland where the mode of transport is driving
+## and SA2 residence is not the same as SA2 workplace 
+jtw_driving_akl <- jtw_data[(jtw_data$Drive_a_company_car_truck_or_van > 0 | 
+  jtw_data$Drive_a_private_car_truck_or_van > 0), ] %>% 
+  left_join(key_2[, 1:2], by = c("SA2_code_usual_residence_address" = 
+                                   "Statistical area 2 code (2018 areas)")) %>%
+  filter(Territorial_auth_desc == "Auckland" & 
+           SA2_code_usual_residence_address != SA2_code_workplace_address)
+
+## CAS data
+cas_data <- readRDS("~/Documents/University of Auckland/COMPSCI 791 Research Project/data/Crash_Analysis_System_(CAS)_data.rds")
+
+## create a new column called non_injury_crash
+cas_data$non_injury_crash <- ifelse(cas_data$crashSeverity == 'Non-Injury Crash', 1, 0)
+
+table(cas_data$crashSeverity)
+
+## total crashes
+cas_data$total <- cas_data$fatalCount + cas_data$minorInjuryCount + cas_data$seriousInjuryCount + cas_data$non_injury_crash
+
+cas_data_akl_proj <- st_as_sf(cas_data[cas_data$region == 'Auckland Region',], coords = c("X", "Y"), crs = 2193)
+
+cas_data_akl_geo <- st_transform(cas_data_akl_proj, crs = 4326)
+
+##filtering the data to serious and fatal crashes in 2018 around the Auckland Region
+cas_data_akl_2018_geo <-  cas_data_akl_geo[(cas_data_akl_geo$crashYear == 2018 & cas_data_akl_geo$region == "Auckland Region"), ]
+
+```
+
 
 
 ### 1. Get routes function

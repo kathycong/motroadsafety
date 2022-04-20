@@ -7,17 +7,17 @@
 #' @param lat_dest The latitude coordinates of the destination point, needs to be a vector
 #' @param lng_dest The longitude coodinates of the destination point, needs to be a vector
 
-get_routes <- function(lat_source, lng_source, lat_dest, lng_dest, osm_dir){
+get_routes <- function(lat_source, lng_source, lat_dest, lng_dest, osm_dir = NULL){
   ##note that gh::route uses the parameter "vehicle" to specify the transportation
   ##mode
 
   #checking NZ osm file is available
-  if(missing(osm_dir)){
-    if (!file.exists("new-zealand-latest.osm.pbf")){
-      download.file("https://download.geofabrik.de/australia-oceania/new-zealand-latest.osm.pbf", "new-zealand-latest.osm.pbf")
-      warning("Downloading osm pbf file from https://download.geofabrik.de/australia-oceania/new-zealand-latest.osm.pbf")
-    }
-    osm_dir <- "new-zealand-latest.osm.pbf"   }
+  #if(missing(osm_dir)){
+  #  if (!file.exists("new-zealand-latest.osm.pbf")){
+   #   download.file("https://download.geofabrik.de/australia-oceania/new-zealand-latest.osm.pbf", "new-zealand-latest.osm.pbf")
+   #   warning("Downloading osm pbf file from https://download.geofabrik.de/australia-oceania/new-zealand-latest.osm.pbf")
+   # }
+   # osm_dir <- "new-zealand-latest.osm.pbf"   }
 
 
   ##Error handling on inputs
@@ -40,7 +40,7 @@ get_routes <- function(lat_source, lng_source, lat_dest, lng_dest, osm_dir){
     stop("inputs must not contain NAs")
 
   #initialise router
-  ghroute::router(osm.file = osm_dir)
+  #ghroute::router(osm.file = osm_dir)
 
   ##get list of routes
   routes_list <- lapply(seq.int(length(lat_source)), function(i) {
@@ -63,8 +63,8 @@ get_routes <- function(lat_source, lng_source, lat_dest, lng_dest, osm_dir){
   })
 
   #https://stackoverflow.com/questions/21937640/handling-java-lang-outofmemoryerror-when-writing-to-excel-from-r
-  gc()
- rJava::.jcall("java/lang/System", method = "gc")
+ # gc()
+# rJava::.jcall("java/lang/System", method = "gc")
 
  output
 }
