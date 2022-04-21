@@ -17,7 +17,7 @@ library(knitr)
 
 library(sf)
 library(ghroute)
-router(osm.file = "~/Documents/University of Auckland/COMPSCI 791 Research Project/mot_road_safety_project/osm")
+router(osm.file = "~/Documents/University of Auckland/COMPSCI 791 Research Project/mot_road_safety_project/osm/new-zealand-latest.osm.pbf")
 library(leaflet)
 library(mapview)
 library(readxl)
@@ -70,6 +70,33 @@ jtw_driving_akl <- jtw_data[(jtw_data$Drive_a_company_car_truck_or_van > 0 |
   filter(Territorial_auth_desc == "Auckland" & 
            SA2_code_usual_residence_address != SA2_code_workplace_address)
 
+
+## setting the coordinates 
+jtw_driving_akl_res_proj <- st_as_sf(jtw_driving_akl, coords = c("SA2_usual_residence_easting", "SA2_usual_residence_northing"), crs = 2193)
+jtw_driving_akl_work_proj <- st_as_sf(jtw_driving_akl, coords = c("SA2_workplace_easting", "SA2_workplace_northing"), crs = 2193) 
+
+jtw_data_usual_res_geo <-  st_transform(jtw_driving_akl_res_proj, 4326)
+
+jtw_data_work_geo <-  st_transform(jtw_driving_akl_work_proj, 4326)
+
+jtw_data_akl_coords_matrix <- matrix(c(st_coordinates(jtw_data_usual_res_geo)[, 2:1], st_coordinates(jtw_data_work_geo)[ ,2:1]), ncol = 4)
+
+#route(x, start.lon, end.lat, end.lon, ...)
+
+r <- 
+  data.frame(start_lat = jtw_data_akl_coords_matrix[ ,1],
+             start_lon = jtw_data_akl_coords_matrix[ ,2],
+             end_lat = jtw_data_akl_coords_matrix[ ,3],
+             end_lon = jtw_data_akl_coords_matrix[ ,4])
+
+jtw_driving_akl <- 
+  cbind(jtw_driving_akl, r)
+
+#saveRDS(jtw_driving_akl, "")
+
+##loading the data into the package
+use_data(jtw_driving_akl, overwrite = TRUE)
+
 ## CAS data
 cas_data <- readRDS("~/Documents/University of Auckland/COMPSCI 791 Research Project/data/Crash_Analysis_System_(CAS)_data.rds")
 
@@ -77,6 +104,9 @@ cas_data <- readRDS("~/Documents/University of Auckland/COMPSCI 791 Research Pro
 cas_data$non_injury_crash <- ifelse(cas_data$crashSeverity == 'Non-Injury Crash', 1, 0)
 
 table(cas_data$crashSeverity)
+
+sum(is.na(cas_data$crashSeverity))
+
 
 ## total crashes
 cas_data$total <- cas_data$fatalCount + cas_data$minorInjuryCount + cas_data$seriousInjuryCount + cas_data$non_injury_crash
@@ -87,6 +117,21 @@ cas_data_akl_geo <- st_transform(cas_data_akl_proj, crs = 4326)
 
 ##filtering the data to serious and fatal crashes in 2018 around the Auckland Region
 cas_data_akl_2018_geo <-  cas_data_akl_geo[(cas_data_akl_geo$crashYear == 2018 & cas_data_akl_geo$region == "Auckland Region"), ]
+
+sa2_clipped_geo_akl <- sa2_clipped_geo_akl
+##################
+
+##save to rda
+save(sa2_clipped_geo_akl, cas_data_akl_geo, jtw_driving_akl, file = "~/Documents/University of Auckland/COMPSCI 791 Research Project/mot_road_safety_project/motroadsafety/data/mot_road_safety_data.rda")
+
+data("mot_road_safety_data")
+
+load(file = "mot_road_safety_data.rda")
+
+
+use_data(sa2_clipped_geo_akl, cas_data_akl_geo, jtw_driving_akl)
+
+names(jtw_driving_akl)
 
 ```
 
@@ -109,6 +154,81 @@ get_routes(c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "Y"],-36.85576)
 
 test_get_routes
 
+test_get_routes <- ghroute::route(matrix(c(c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "Y"],-36.85576),
+           c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "X"],174.8324),
+           c(sf::st_coordinates(jtw_work_geo_sample_data)[, "Y"],41.2709),
+           c(sf::st_coordinates(jtw_work_geo_sample_data)[, "X"],173.1476)), nrow = 4, ncol = 4), output = "sf")
+
+## contains character
+m3 <- matrix(c(c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "Y"],-36.85576),
+           c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "X"],174.8324),
+           c(sf::st_coordinates(jtw_work_geo_sample_data)[, "Y"],41.2709),
+           c(sf::st_coordinates(jtw_work_geo_sample_data)[, "X"], "d")), nrow = 4, ncol = 4)
+
+##contains NAs
+m2 <- matrix(c(c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "Y"],-36.85576),
+           c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "X"],174.8324),
+           c(sf::st_coordinates(jtw_work_geo_sample_data)[, "Y"],41.2709),
+           c(sf::st_coordinates(jtw_work_geo_sample_data)[, "X"], NA)), nrow = 4, ncol = 4)
+
+get_routes(c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "Y"],-36.85576),
+           c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "X"],174.8324),
+           c(sf::st_coordinates(jtw_work_geo_sample_data)[, "Y"],41.2709),
+           c(sf::st_coordinates(jtw_work_geo_sample_data)[, "X"],173.1476))
+
+m1 <- matrix(c(c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "Y"],-36.85576),
+           c(sf::st_coordinates(jtw_usual_res_geo_sample_data)[, "X"],174.8324),
+           c(sf::st_coordinates(jtw_work_geo_sample_data)[, "Y"],41.2709),
+           c(sf::st_coordinates(jtw_work_geo_sample_data)[, "X"],0)), nrow = 4, ncol = 4)
+
+###############################
+
+
+jtw_akl_routes <- get_routes(as.matrix(jtw_driving_akl[names(jtw_driving_akl)[21:24]]))
+
+#16035    24
+dim(jtw_driving_akl)
+
+# 16035     7
+dim(jtw_akl_routes)
+
+str(jtw_driving_akl)
+
+#jtw_data[(jtw_data$Drive_a_company_car_truck_or_van > 0 | 
+  #jtw_data$Drive_a_private_car_truck_or_van > 0), ] %>% 
+
+## getting the total driving commuters and creating a new column
+jtw_driving_akl$total_driving_travellers <- 
+  ifelse(jtw_driving_akl$Drive_a_company_car_truck_or_van >0, jtw_driving_akl$Drive_a_company_car_truck_or_van, 0) +
+  ifelse(jtw_driving_akl$Drive_a_private_car_truck_or_van >0, jtw_driving_akl$Drive_a_private_car_truck_or_van, 0) 
+
+##selecting only important column
+jtw_driving_akl_2 <- jtw_driving_akl[c(1:8, 29)]
+
+## adding routes to data
+jtw_driving_akl_with_routes <- cbind(jtw_akl_routes, jtw_driving_akl_2)
+
+head(jtw_driving_akl_with_routes)
+dim(jtw_driving_akl_with_routes)
+
+test <- get_routes(m1)
+
+class(st_geometry(st_geometry(test)))
+
+class(st_geometry(st_geometry(st_geometry(test))))
+
+class(st_geometry(sa2_clipped_geo_akl))
+
+class(st_geometry(sa2_clipped_geo_akl))
+
+
+!(inherits(test, "data.frame") & inherits(test, "sf"))
+
+st_sfc(st_polygon(list(rbind(c(-1, -1), c(1, -1), c(1, 1), c(-1, -1)))))
+class(st_sfc(st_polygon(list(rbind(c(-1, -1), c(1, -1), c(1, 1), c(-1, -1))))))
+
+
+############################
 leaflet() %>% 
   addTiles() %>%
   addPolygons(data = sa2_clipped_geo_akl[372, ], color = 'red', fillOpacity = .2) %>% 
@@ -127,6 +247,7 @@ leaflet() %>%
 
 ```
 
+
 ### 2. Get intersections function
 
 The purpose of this function is to provide the indices of
@@ -140,6 +261,7 @@ test_get_route_intersects
 test_get_route_intersects_inverse <-  get_route_intersects(test_get_routes, 
                                                            sa2_clipped_geo_akl, 
                                                            inverse = TRUE)
+
 
 test_get_route_intersects_inverse
 
@@ -157,7 +279,7 @@ leaflet() %>%
   addPolylines(data = st_geometry(test_get_routes)[3], color = 'orange') 
   
 
-  
+
 
 ```
 
@@ -173,6 +295,20 @@ mapview(get_dist_travelled_test, zcol = 'total_dist',
 
 head(get_dist_travelled_test)
 
+###############################
+
+
+
+test_get_dist_travel <- get_dist_travel(sa2_clipped_geo_akl, test)
+
+
+full_get_dist_travel <- get_dist_travel(sa2_clipped_geo_akl, jtw_akl_routes)
+
+
+
+
+###############################
+
 leaflet() %>% 
   addTiles() %>%
   addPolygons(data = get_dist_travelled_test[!is.na(get_dist_travelled_test$weight), ], opacity = .1,  color = 'blue') %>% 
@@ -182,6 +318,77 @@ leaflet() %>%
 
 
 ```
+
+### 3a. Parallelising this run
+
+detectCores()
+- Used to determine available number of cores.
+
+mclapply(X, FUN, mc.cores=) 
+- from the parallel library to run code on multiple cores at once and get teh result as a list
+
+X - vector or list
+FUN - function to be called on each element or component of X
+mc.cores - number of cores to use
+
+* X is split into as many parts as there are cores and each core works on one part
+* The results from all cores are gathered back into a list (the same length as X)
+
+```{r}
+
+full_get_dist_travel <- get_dist_travel(sa2_clipped_geo_akl[1, ], jtw_akl_routes)
+
+test2 <- get_dist_travel(sa2_clipped_geo_akl[1, ], jtw_akl_routes)
+  
+list(sa2_clipped_geo_akl, jtw_akl_routes)
+
+lapply(seq.int(nrow(sa2_clipped_geo_akl)), function(i)
+  {})
+
+seq.int(nrow(sa2_clipped_geo_akl))
+
+system.time(
+test2 <- lapply(seq.int(nrow(sa2_clipped_geo_akl)), function(i)
+  {get_dist_travel(sa2_clipped_geo_akl[i, ], jtw_akl_routes)}))
+
+   # user    system   elapsed 
+#12350.402   763.927 62768.639 
+length(test2)
+head(test2)
+
+saveRDS(test2, "get_dist_travel_raw.rds")
+
+test2 <- readRDS("get_dist_travel_raw.rds")
+
+full_get_dist_test <- do.call(rbind, test2)
+
+head(full_get_dist_test)
+
+
+```
+
+
+```{r}
+## getting distance travelled including travellers per
+
+
+system.time(
+dist_travelled_raw <- lapply(seq.int(nrow(sa2_clipped_geo_akl)), function(i)
+  {print(i)
+  get_dist_travel(sa2_clipped_geo_akl[i, ], jtw_driving_akl_with_routes, jtw_driving_akl_with_routes$total_driving_travellers)}))
+
+
+
+length(dist_travelled_raw)
+
+saveRDS(dist_travelled_raw, "dist_travelled_raw.rds")
+
+dist_travelled_data <- do.call(rbind, dist_travelled_raw)
+
+head(dist_travelled_data)
+
+```
+
 
 ### 4. Get Risk function
 
