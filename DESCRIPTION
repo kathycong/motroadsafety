@@ -1,0 +1,22 @@
+Package: motroadsafety
+Type: Package
+Title: Road Safety Data Analysis
+Version: 0.1.0
+Author: Kathlyn Ycong, Simon Urbanek, Shrividya Ravi
+Maintainer: Kathlyn Ycong <kyco720@aucklanduni.ac.nz>
+Description: Tools to help process and analyse road safety data from Statistics. New Zealand and crash data from Waka Kotahi or New Zealand Transport Agency.
+License: GPL2
+Date: 2022-06-18
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.2
+Depends: 
+    R (>= 2.10)
+Imports:
+    dplyr,
+    ghroute,
+    rJava,
+    sf
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
