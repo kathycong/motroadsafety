@@ -1,13 +1,12 @@
 #' Getting the polygons or route intersects
 #'
 #' This function gets the vector of the polygon ids or codes where a given route
-#' is intersected
+#' has intersected
 #'
-#' @param routes An sf linesegment object representing routes of multiple
-#' source-destination points
+#' @param routes An sf dataframe with a LINESTRING geometry type that represents routes of multiple
+#' source-destination points.
 #'
-#' @param polygon The polygon as geographic coordinate system we wanted to find
-#' whether the routes have intersected or not
+#' @param polygon An sf dataframe with a MULTIPOLYGON geometry.
 #'
 #' @param inverse The default is FALSE. If FALSE, returns a list of routes length
 #' and contains the indices of the polygon that intersected with the routes. If

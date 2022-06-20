@@ -7,11 +7,10 @@
 get_route_intersects(routes, polygon, inverse = FALSE)
 }
 \arguments{
-\item{routes}{An sf linesegment object representing routes of multiple
-source-destination points}
+\item{routes}{An sf dataframe with a LINESTRING geometry type that represents routes of multiple
+source-destination points.}
 
-\item{polygon}{The polygon as geographic coordinate system we wanted to find
-whether the routes have intersected or not}
+\item{polygon}{An sf dataframe with a MULTIPOLYGON geometry.}
 
 \item{inverse}{The default is FALSE. If FALSE, returns a list of routes length
 and contains the indices of the polygon that intersected with the routes. If
@@ -25,7 +24,7 @@ intersected and vice versa for routes.
 }
 \description{
 This function gets the vector of the polygon ids or codes where a given route
-is intersected
+has intersected
 }
 \examples{
 \dontrun{
